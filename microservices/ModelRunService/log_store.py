@@ -45,7 +45,7 @@ def create_log():
     run_id = data['run_id']
     onedrive_link = data['onedrive_link']
     log_id = mongo_service.create_log_entry(run_id, onedrive_link)
-    return jsonify({'message': 'Log created', 'log_id': log_id}), 201
+    return jsonify({'message': 'Log created', 'log_id': str(log_id)}), 201
 
 @app.route('/logs/<run_id>', methods=['GET'])
 def retrieve_log(run_id):

@@ -69,20 +69,20 @@ def UploadOneDrive(model_name, run_id):
 def UpdateDB(onedrive_link, run_id):
     # Update the database with the link to the logs
 
-    api_url = 'localhost:8000/logs'
+    api_url = 'http://127.0.0.1:8000/logs'
 
     params = {
         'onedrive_link': onedrive_link,
         'run_id': run_id
     }
 
-    response = requests.post(api_url, params=params)
+    response = requests.post(api_url, json=params)
 
-    if response.status_code == 200:
+    if response.status_code == 201:
         print("Database updated successfully.")
         return True
     else:
         print(f"Failed to update database. Error: {response.text}")
         return False
     
-UpdateDB("<link>", "DSJFBJESFN")
+UpdateDB("some_strings", "DSJFBJESFN")
