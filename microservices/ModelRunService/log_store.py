@@ -75,4 +75,4 @@ def delete_log(run_id):
         return jsonify({'message': 'Delete failed'}), 404
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8000)

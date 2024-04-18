@@ -66,13 +66,13 @@ def UploadOneDrive(model_name, run_id):
         print(f"Failed to store logs for run {run_id}. Error: {response.text}")
 
 
-def UpdateDB(model_name, run_id):
+def UpdateDB(onedrive_link, run_id):
     # Update the database with the link to the logs
 
-    api_url = 'http://your_api_endpoint_here'
+    api_url = 'localhost:8000/logs'
 
     params = {
-        'model_name': model_name,
+        'onedrive_link': onedrive_link,
         'run_id': run_id
     }
 
@@ -84,3 +84,5 @@ def UpdateDB(model_name, run_id):
     else:
         print(f"Failed to update database. Error: {response.text}")
         return False
+    
+UpdateDB("<link>", "DSJFBJESFN")
