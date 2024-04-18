@@ -3,14 +3,12 @@ import zipfile
 import io
 import os
 
-
 def LoadModel(model_name):
     # API endpoint URL
     api_url = 'http://your_api_endpoint_here'
     
     # Parameters to be sent with the request
     params = {'model_name': model_name}
-    
     try:
         # Sending GET request to the API endpoint
         response = requests.get(api_url, params=params)
