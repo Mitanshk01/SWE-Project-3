@@ -20,7 +20,8 @@ def ModelLog(input_dict):
     except pd.errors.EmptyDataError:
         df = pd.DataFrame()
 
-    df = df.append(input_dict, ignore_index=True)
+    new_row = pd.DataFrame(input_dict, index=[0])
+    df = pd.concat([df, new_row], ignore_index=True)
     df.to_csv(path, index=False)
 
     print("Log stored successfully.")
