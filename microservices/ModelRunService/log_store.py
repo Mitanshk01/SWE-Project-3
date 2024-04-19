@@ -12,10 +12,11 @@ class MongoDBService:
         self.db: Database = self.client['log_storage']
         self.collection: Collection = self.db['logs']
 
-    def create_log_entry(self, run_id: str, onedrive_link: str):
+    def create_log_entry(self, run_id: str, onedrive_link_logs: str, onedrive_link_results: str):
         log_entry = {
             'run_id': run_id,
-            'onedrive_link': onedrive_link
+            'onedrive_link_logs': onedrive_link_logs,
+            'onedrive_link_results': onedrive_link_results
         }
         print("Creating log entry   ", log_entry)
         result = self.collection.insert_one(log_entry)
@@ -26,9 +27,9 @@ class MongoDBService:
         log_entry = self.collection.find_one(query)
         return log_entry
 
-    def update_log_entry(self, run_id: str, onedrive_link: str):
+    def update_log_entry(self, run_id: str, onedrive_link_logs: str, onedrive_link_results: str):
         query = {'run_id': run_id}
-        update = {"$set": {'onedrive_link': onedrive_link}}
+        update = {"$set": {'onedrive_link_logs': onedrive_link_logs, 'onedrive_link_results': onedrive_link_results}}
         result = self.collection.update_one(query, update)
         return result.modified_count
 
@@ -43,8 +44,9 @@ mongo_service = MongoDBService(DB_URI)
 def create_log():
     data = request.json
     run_id = data['run_id']
-    onedrive_link = data['onedrive_link']
-    log_id = mongo_service.create_log_entry(run_id, onedrive_link)
+    onedrive_link_results = data['onedrive_link_results']
+    onedrive_link_logs = data['onedrive_link_logs']
+    log_id = mongo_service.create_log_entry(run_id, onedrive_link_logs, onedrive_link_results)
     return jsonify({'message': 'Log created', 'log_id': str(log_id)}), 201
 
 @app.route('/logs/<run_id>', methods=['GET'])
@@ -59,8 +61,9 @@ def retrieve_log(run_id):
 @app.route('/logs/<run_id>', methods=['PUT'])
 def update_log(run_id):
     data = request.json
-    onedrive_link = data['onedrive_link']
-    modified_count = mongo_service.update_log_entry(run_id, onedrive_link)
+    onedrive_link_logs = data['onedrive_link_logs']
+    onedrive_link_results = data['onedrive_link_results']
+    modified_count = mongo_service.update_log_entry(run_id, onedrive_link_logs, onedrive_link_results)
     if modified_count:
         return jsonify({'message': 'Log updated'}), 200
     else:

@@ -3,52 +3,37 @@ import json
 import zipfile
 import requests
 
-def ProcessLogs(model_name, run_id, results_path):
-    # Get the variables to be tracked from config file in model  
-    with open(f"models/{model_name}/config.json") as f:
-        config = json.load(f)
-
-    variables = config["variables"]
-
-    # Get the logs from the log file
-    with open(results_path) as f:
-        logs = f.readlines()
-
-    # Scrape the variables from the logs
-    data = {}
-    for log in logs:
-        for variable in variables:
-            if variable in log:
-                data[variable] = log.split("=")[1]
-
-    # Save the data to a csv file
-    df = pd.DataFrame(data, index=[0])
-    df.to_csv(f"results/{model_name}/{run_id}_data.csv", index=False)
-
-    StoreLogs(model_name, run_id, results_path)
-
-def StoreLogs(model_name, run_id, results_path):
+def store_logs(model_name, run_id):
     # Store the file in OneDrive
-    file_path = "results/{model_name}/{run_id}_data.csv"
+    logs_path = "results/{model_name}/{run_id}_logs.csv"
+    results_path = f"results/{model_name}/{run_id}.txt"
 
     # Zip the file and upload it to OneDrive
-    with zipfile.ZipFile(f"results/{model_name}/{run_id}_data.zip", 'w') as zip_ref:
-        zip_ref.write(file_path)
+    with zipfile.ZipFile(f"results/{model_name}/{run_id}_logs.zip", 'w') as zip_ref:
+        zip_ref.write(logs_path)
 
-    UploadOneDrive(model_name, run_id)
+    with zipfile.ZipFile(f"results/{model_name}/{run_id}_data.zip", 'w') as zip_ref:
+        zip_ref.write(results_path)
+
+    drive_api_url = 'https://graph.microsoft.com/v1.0/me/drive/root:/FolderName/Filename:/content'
+    drive_api_url += "/users"
+
+    # Upload the zip file to OneDrive
+    upload_one_drive(run_id, logs_path, drive_api_url+"/" + logs_path)
+    upload_one_drive(run_id, results_path, drive_api_url+"/" + results_path)
+
+    update_database(drive_api_url+"/" + logs_path, drive_api_url+"/" + results_path, run_id)
 
     print(f"Logs for run {run_id} stored successfully.")
 
 
-def UploadOneDrive(model_name, run_id):
+def upload_one_drive(run_id, path, api_url):
     # Upload the zip file to OneDrive
-
-    api_url = 'https://graph.microsoft.com/v1.0/me/drive/root:/FolderName/Filename:/content'
 
     access_token = 'your_access_token'  # replace with your actual access token
     headers = {'Authorization': 'Bearer ' + access_token}
     params = {'@name.conflictBehavior': 'rename'}
-    data = open(f"results/{model_name}/{run_id}_data.zip", 'rb').read()
+    data = open(path, 'rb').read()
 
     response = requests.put(
         api_url,
@@ -58,21 +43,19 @@ def UploadOneDrive(model_name, run_id):
     )
 
     if response.status_code == 201:
-        if UpdateDB(model_name, run_id):
-            print(f"Logs for run {run_id} stored successfully.")
-        else:
-            print("Failed to update database but uploaded on OneDrive")
+        print(f"Logs for run {run_id} stored successfully.")
     else:
         print(f"Failed to store logs for run {run_id}. Error: {response.text}")
 
 
-def UpdateDB(onedrive_link, run_id):
+def update_database(onedrive_link_logs, onedrive_link_results, run_id):
     # Update the database with the link to the logs
 
     api_url = 'http://127.0.0.1:8000/logs'
 
     params = {
-        'onedrive_link': onedrive_link,
+        'onedrive_link_logs': onedrive_link_logs,
+        'onedrive_link_results': onedrive_link_results,
         'run_id': run_id
     }
 
@@ -85,4 +68,3 @@ def UpdateDB(onedrive_link, run_id):
         print(f"Failed to update database. Error: {response.text}")
         return False
     
-UpdateDB("some_strings", "DSJFBJESFN")

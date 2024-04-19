@@ -1,10 +1,13 @@
 import os
 from load_dataset import LoadDataset
 from load_model import LoadModel
-from process_logs import ProcessLogs
+from process_logs import store_logs
 import uuid
 
-def ModelRun(dataset_name, model_name):
+run_id = "run_id"
+global_model_name = "model_name"
+
+def run_model(dataset_name, model_name):
     # copy the dataset directory
     LoadDataset(dataset_name)
 
@@ -16,6 +19,7 @@ def ModelRun(dataset_name, model_name):
         return "Error: No run.py file in the model directory"
     
     run_id = uuid.uuid4().hex
+    # global_model_name = model_name
     os.makedirs(f"results/{model_name}", exist_ok=True)
     results_path = f'results/{model_name}/{run_id}.txt'
     
@@ -27,9 +31,6 @@ def ModelRun(dataset_name, model_name):
     with open("results.txt", "r") as file:
         results = file.read()
 
-    ProcessLogs(model_name, run_id, results_path)
+    store_logs(model_name, run_id)
 
     return results
-
-
-
