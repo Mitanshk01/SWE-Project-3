@@ -22,7 +22,7 @@ def upload_file():
 
     file.seek(0)
 
-    # Forward the file to the OneDrive microservice
+    # Forward the file to the Drive microservice
     try:
         data = {'filename': filename}
         files = {'file': file}  # Assuming 'filename' is the name of the file
@@ -41,8 +41,6 @@ def upload_file():
 def upload_dataset_chunk():
     print("\n\tReceived a dataset upload request")
     try:
-        print(request.files)
-
         chunk = request.files['file']
         offset = int(request.form['offset'])
         current_chunk_index = int(request.form['currentChunkIndex'])
@@ -54,30 +52,26 @@ def upload_dataset_chunk():
         print(f"Received chunk {current_chunk_index+1}/{total_chunks} of file {file_name} of type {file_type}")
         print(f"Current offset {offset} of total size {total_size}")
 
-        return
 
-        # Define a directory to temporarily store chunk files
-        temp_dir = 'temp'
-        if not os.path.exists(temp_dir):
-            os.makedirs(temp_dir)
+        data = {
+            'offset': offset,
+            'currentChunkIndex': current_chunk_index,
+            'totalChunks': total_chunks,
+            'totalSize': total_size,
+            'filename': file_name,
+            'filetype': file_type
+        }
 
-        # Save the chunk to a temporary file
-        temp_filename = os.path.join(temp_dir, f'chunk_{current_chunk_index}')
-        with open(temp_filename, 'ab') as temp_file:
-            temp_file.write(chunk.read())
+        files = {'file': chunk}
 
-        # If all chunks have been received, reconstruct the file
-        if current_chunk_index == total_chunks - 1:
-            with open('dataset_file.dat', 'wb') as dataset_file:
-                for i in range(total_chunks):
-                    chunk_filename = os.path.join(temp_dir, f'chunk_{i}')
-                    with open(chunk_filename, 'rb') as chunk_file:
-                        dataset_file.write(chunk_file.read())
-                    # Remove the temporary chunk file
-                    os.remove(chunk_filename)
-            print('Dataset file reconstructed successfully')
+        response = requests.post('http://localhost:8004/upload_dataset_chunk', data=data, files=files)
+        if response.status_code == 200:
+            print("File uploaded!\n")
+            return jsonify({'message': 'File uploaded successfully to OneDrive'})
+        else:
+            print("File NOT uploaded!\n")
+            return jsonify({'error': 'Failed to upload file to OneDrive'}), 500
 
-        return jsonify({'message': 'Dataset chunk uploaded successfully'})
     except Exception as e:
         print("Got error!", e)
         return jsonify({'error': str(e)}), 500
