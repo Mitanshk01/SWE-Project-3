@@ -228,6 +228,8 @@ def upload_dataset_chunk():
         with open(chunk_file_path, "wb") as chunk_file:
             chunk_file.write(chunk.read())
 
+        print("Saved chunk to", chunk_file_path)
+
         # Check if all chunks have been received
         if current_chunk_index == total_chunks - 1:
             # Concatenate the chunk files
@@ -238,7 +240,7 @@ def upload_dataset_chunk():
                         consolidated_file.write(chunk_file.read())
                     
                     # Remove the chunk file after concatenating
-                    os.remove(os.path.join(CHUNKS_DIR, f"{file_name}_{i}"))
+                    os.remove(os.path.join(CHUNKS_DIR, f"{user_id}_{repo_name}_{file_name}_{i}"))
             
             # Upload the consolidated file to Google Drive
             google_drive_client.upload_file(file_path=consolidated_file_path, file_name=file_name)

@@ -59,7 +59,9 @@ def upload_dataset_chunk():
             'totalChunks': total_chunks,
             'totalSize': total_size,
             'filename': file_name,
-            'filetype': file_type
+            'filetype': file_type,
+            'userid': 'dummy_user',
+            'repoName': 'dummy_repo',
         }
 
         files = {'file': chunk}
