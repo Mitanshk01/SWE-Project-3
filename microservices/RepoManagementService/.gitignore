@@ -3,4 +3,5 @@
 */*/*.json
 /chunk_files
 /download_files
+/biggerenvname
 *.db

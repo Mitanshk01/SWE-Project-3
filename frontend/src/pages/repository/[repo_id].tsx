@@ -38,6 +38,9 @@ const RepositoryPage = () => {
   const [datasetFile, setDatasetFile] = useState(null);
   const [uploadComplete, setUploadComplete] = useState(false);
 
+  const [codeDetails, setCodeDetails] = useState([]);
+  const [dataDetails, setDataDetails] = useState([]);
+
   var user_id =
     typeof window !== "undefined" ? localStorage.getItem("user_id") : null;
 
@@ -211,10 +214,12 @@ const RepositoryPage = () => {
     // get code details
     const codeDetails = await getCodeFileMetadataFromRepo(user_id, repo_id);
     console.log("Code Details: ", codeDetails);
+    setCodeDetails(codeDetails);
 
     // get data details
     const dataDetails = await getDataFileMetadataFromRepo(user_id, repo_id);
     console.log("Data Details: ", dataDetails);
+    setDataDetails(dataDetails);
 
     // get runs
     const runs = await getRunsFromRepo(user_id, repo_id);
@@ -324,10 +329,20 @@ const RepositoryPage = () => {
   };
 
   const startTraining = async () => {
-    console.log("Start training with", newRunName, newRunDescription);
-    const codeFiles = await fetchCodeFileMetadata();
-    if (codeFiles.length > 0) {
-      console.log("Training will start with the following code files:", codeFiles);
+
+    if (codeDetails.length > 0) {
+      console.log("Training will start with the following code : ", codeDetails.name);
+      console.log("And with the following : ", codeDetails.id);
+
+      //ping the backend to start training
+      const response = await axios.post(`http://localhost:8004/start_training`, {
+        file_id: codeDetails.id,
+        file_name: codeDetails.name,
+        user_id: user_id,
+        repo_name: repo_id,
+        run_description: newRunDescription
+      });
+
     } else {
       console.error("No code files available for training.");
     }
