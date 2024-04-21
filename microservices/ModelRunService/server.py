@@ -1,17 +1,18 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from model_run import ModelRun
+from model_run import train_model
 import os
 
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/run_model', methods=['POST'])
-def run_model():
+@app.route('/train_model', methods=['POST'])
+def train():
     request_data = request.json
-    dataset_name = request_data['dataset_name']
-    model_name = request_data['model_name']  # format repo/model
-    model_run = ModelRun(dataset_name, model_name)
+    user_id = request_data['user_id']
+    repo_name = request_data['repoName']  # format repo/model
+    run_id = request_data['run_id']
+    model_run = train_model(user_id, repo_name, run_id)
     result = model_run.run()
     return jsonify(result)
 
