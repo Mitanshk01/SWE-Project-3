@@ -323,10 +323,14 @@ const RepositoryPage = () => {
     // TODO : Update data using backend
   };
 
-  const startTraining = () => {
+  const startTraining = async () => {
     console.log("Start training with", newRunName, newRunDescription);
-    // You would add your logic to initiate training here.
-    // After starting the training, you can close the modal.
+    const codeFiles = await fetchCodeFileMetadata();
+    if (codeFiles.length > 0) {
+      console.log("Training will start with the following code files:", codeFiles);
+    } else {
+      console.error("No code files available for training.");
+    }
     setOpenModal(null);
   };
 
@@ -340,6 +344,30 @@ const RepositoryPage = () => {
     console.log("Starting inference");
     setOpenModal(null);
     // Placeholder for actual start infer logic
+  };
+
+  const fetchCodeFileMetadata = async () => {
+    try {
+      const user_id = localStorage.getItem("user_id");
+      const repo_name = repository?.name; // Ensure you have the repository name from your state
+  
+      if (user_id && repo_name) {
+        const response = await axios.get(`http://localhost:8004/get_code_file_metadata_from_repo`, {
+          params: {
+            user_id: user_id,
+            repo_name: repo_name
+          }
+        });
+        console.log("Code file metadata:", response.data);
+        return response.data;
+      } else {
+        console.error("User ID or Repository Name is missing");
+        return [];
+      }
+    } catch (error) {
+      console.error("Failed to fetch code file metadata", error);
+      return [];
+    }
   };
 
   return (
