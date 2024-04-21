@@ -1,1 +1,3 @@
 backend/node_modules/
+microservices/ModelRunService/credentials.json
+microservices/ModelRunService/client_secrets.json

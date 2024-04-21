@@ -4,22 +4,27 @@ from model_run import train_model
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 @app.route('/train_model', methods=['POST'])
 def train():
     request_data = request.json
+    print(request_data)
     user_id = request_data['user_id']
-    repo_name = request_data['repoName']  # format repo/model
-    run_id = request_data['run_id']
-    model_run = train_model(user_id, repo_name, run_id)
-    result = model_run.run()
-    return jsonify(result)
+    repo_name = request_data['repo_name']  # format repo/model
+    run_id = request_data['run_name']
+    model_file_id = request_data['model_file_id']
+    data_file_id = request_data['data_file_id']
+    model_run = train_model(user_id, repo_name, run_id, model_file_id, data_file_id)
+
+    print(f"Training model for user {user_id}, repo {repo_name}, run {run_id}, file {file_id}")
+
+    return jsonify({'status': 'success'})
+    # return jsonify(result)
 
 if __name__ == '__main__':
-    # make model and data directory
     os.makedirs('model', exist_ok=True)
     os.makedirs('data', exist_ok=True)
-    app.run(host='localhost', port=5000)
+    app.run(host='localhost', port=5000, debug=True)
 
 

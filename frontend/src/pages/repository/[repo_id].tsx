@@ -331,17 +331,22 @@ const RepositoryPage = () => {
   const startTraining = async () => {
 
     if (codeDetails.length > 0) {
-      console.log("Training will start with the following code : ", codeDetails.name);
-      console.log("And with the following : ", codeDetails.id);
+      console.log("Training will start with the following code : ", codeDetails[0].name);
+      console.log("And with the following : ", codeDetails[0].id);
 
       //ping the backend to start training
-      const response = await axios.post(`http://localhost:8004/start_training`, {
-        file_id: codeDetails.id,
-        file_name: codeDetails.name,
+      const response = await axios.post(`http://localhost:5000/train_model`, {
+        model_file_id: codeDetails[0].id,
+        model_file_name: codeDetails[0].name,
+        data_file_id: dataDetails[0].id,
+        data_file_name: dataDetails[0].name,
         user_id: user_id,
         repo_name: repo_id,
+        run_name: newRunName,
         run_description: newRunDescription
       });
+
+      console.log("Response from backend: ", response.data);
 
     } else {
       console.error("No code files available for training.");
@@ -456,7 +461,7 @@ const RepositoryPage = () => {
             <input
               type="text"
               value={newRunName}
-              onChange={(e) => setNewRunName(e.target.value)}
+              onChange={(e) => {console.log("Changing run name: ", newRunName);setNewRunName(e.target.value)}}
               placeholder="Run Name"
               className="border p-2 w-full"
               required
@@ -497,7 +502,7 @@ const RepositoryPage = () => {
             <input
               type="text"
               value={newRunName}
-              onChange={(e) => setNewRunName(e.target.value)}
+              onChange={(e) => console.log("Changing run name:", newRunName)}
               placeholder="Run Name"
               className="border p-2 w-full"
               required

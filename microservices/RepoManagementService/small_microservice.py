@@ -6,8 +6,8 @@ from pydrive.drive import GoogleDrive
 import os, shutil, io
 import sqlite3
 
-CHUNKS_DIR = "chunk_files"
-DOWNLOAD_FILE_DIR  = "download_files"
+CHUNKS_DIR = "./chunk_files"
+DOWNLOAD_FILE_DIR  = "./download_files"
 SMALL_FILE_THRESH = 30 * 1024 * 1024  # 30MB in bytes
 
 # SQLite database file path
@@ -74,19 +74,27 @@ def clear_tables():
 
 def create_or_clear_directory(directory):
     if os.path.exists(directory):
-        # If the directory already exists, delete its contents
-        for filename in os.listdir(directory):
-            file_path = os.path.join(directory, filename)
-            try:
-                if os.path.isfile(file_path) or os.path.islink(file_path):
-                    os.unlink(file_path)
-                elif os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
-            except Exception as e:
-                print(f"Failed to delete {file_path}. Reason: {e}")
+        print(f"{directory} directory exists already: yaya:::))) ")
+        # TODO: Clear the directory LATER
+        # # If the directory already exists, delete its contents
+        # for filename in os.listdir(directory):
+        #     file_path = os.path.join(directory, filename)
+        #     try:
+        #         if os.path.isfile(file_path) or os.path.islink(file_path):
+        #             os.unlink(file_path)
+        #         elif os.path.isdir(file_path):
+        #             shutil.rmtree(file_path)
+        #     except Exception as e:
+        #         print(f"Failed to delete {file_path}. Reason: {e}")
     else:
         # If the directory does not exist, create it
-        os.makedirs(directory)
+        print("Directory doesn't exist")
+        # create this directory wherever this code is being executed from i.e. "./"
+        os.makedirs(directory, exist_ok=True)
+        print("Directory created")
+        # check whether the directory has been created or not
+        print("Directory created or not: ", os.path.exists(directory))
+
 
 class GoogleDriveClient:
     def __init__(self, credentials_file="credentials.json"):
@@ -503,13 +511,14 @@ def download_file():
     """
     try:
         file_id = request.args.get('file_id')
+        print("Request on download_file route: ", file_id)
         
         if not file_id:
             return jsonify({'error': 'File ID is missing in the request parameters'}), 400
 
         download_dir_path = os.path.join(DOWNLOAD_FILE_DIR, file_id)
+        print("The download directory path: ", download_dir_path)
         create_or_clear_directory(download_dir_path)
-
         file_save_path = google_drive_client.download_file_by_id(file_id, download_dir_path)
 
         return jsonify({'downloaded_file_path': file_save_path}), 200

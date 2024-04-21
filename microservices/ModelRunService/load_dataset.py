@@ -2,36 +2,24 @@ import requests
 import zipfile
 import io
 import os
+import glob
+from vmc import download_file
+from vmc import DOWNLOAD_FILE_DIR
 
-def LoadDataset(user_id, repo_name):
-    # API endpoint URL
-    api_url = 'http://your_api_endpoint_here'
+def LoadDataset(user_id, repo_name, run_id, file_id):
     
-    # Parameters to be sent with the request
-    params = {'dataset_name': dataset_name}
-    
-    try:
-        # Sending GET request to the API endpoint
-        response = requests.get(api_url, params=params)
-        
-        # Checking if request was successful (status code 200)
-        if response.status_code == 200:
-            link = response.json()['link']
-            # Sending GET request to the link provided in the response
-            response = requests.get(link)
+    download_file(file_id)
 
-            if response.status_code != 200:
-                print("Failed to load dataset '{}'. Status code: {}".format(dataset_name, response.status_code))
-                return
+    # Unzip the file
+    with zipfile.ZipFile(f"{DOWNLOAD_FILE_DIR}/{file_id}/*.zip", 'r') as zip_ref:
+        zip_ref.extractall(f"data/{file_id}")
 
-            # Create a zipfile object from the response content
-            with zipfile.ZipFile(io.BytesIO(response.content), 'r') as zip_ref:
-                # Extract all the contents of the zip file
-                os.makedirs(f'./data/{dataset_name}', exist_ok=True)
-                zip_ref.extractall(f'./data/{dataset_name}')  # You can specify the directory where you want to store the files
-            print("Dataset '{}' successfully loaded and extracted.".format(dataset_name))
-            
-        else:
-            print("Failed to load dataset '{}'. Status code: {}".format(dataset_name, response.status_code))
-    except Exception as e:
-        print("An error occurred:", e)
+    # Unzip all .zip files in the directory
+    for file in glob.glob(f"download_files/{file_id}/*.zip"):
+        print(file)
+        with zipfile.ZipFile(file, 'r') as zip_ref:
+            zip_ref.extractall(f"data/{file_id}")
+
+    # Remove the .zip files
+    for file in glob.glob(f"download_files/{file_id}/*.zip"):
+        os.remove(file)
