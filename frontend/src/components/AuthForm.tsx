@@ -36,6 +36,7 @@ const AuthForm = ({ mode }) => {
         alert("Login successful")
         console.log('Token:', response.data.token);  // Log the token or save it in localStorage
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user_id', username);
         router.push('/home');
       }
     } catch (err) {

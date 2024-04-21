@@ -1,0 +1,6 @@
+*.json
+*/*.json
+*/*/*.json
+/chunk_files
+/download_files
+*.db

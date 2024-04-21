@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Repository from "../../components/Repository";
 import Link from "next/link";
+import { uploadCodeToRepo } from "@/components/Requests";
+import { getCodeFileMetadataFromRepo } from "../../components/Requests.js";
+import { getDataFileMetadataFromRepo } from "../../components/Requests.js";
+import { getRunsFromRepo } from "../../components/Requests.js";
 
 interface Run {
   id: number;
@@ -15,7 +19,6 @@ interface Run {
 }
 
 interface Repository {
-  id: number;
   name: string;
   description: string;
   modelAdded: boolean;
@@ -26,10 +29,146 @@ const RepositoryPage = () => {
   const router = useRouter();
   const { repo_id } = router.query;
 
-  const [repository, setRepository] = useState<Repository | null>(null);
+  const [repository, setRepository] = useState<Repository | null>();
   const [runs, setRuns] = useState<Run[]>([]);
   const [newRunName, setNewRunName] = useState("");
   const [newRunDescription, setNewRunDescription] = useState("");
+
+  const [file, setFile] = useState(null);
+  const [datasetFile, setDatasetFile] = useState(null);
+  const [uploadComplete, setUploadComplete] = useState(false);
+
+  var user_id =
+    typeof window !== "undefined" ? localStorage.getItem("user_id") : null;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleDatasetFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setDatasetFile(e.target.files[0]);
+    }
+  };
+
+  const handleFileInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files;
+    if (files) {
+      setFileToUpload(files[0]);
+    }
+  };
+
+  // Handler for file upload
+  const handleFileUpload = async () => {
+    console.log("Uploading file", file);
+    console.log("Repository", repository);
+    if (file && repository) {
+      console.log("Atleast both file and repository are present");
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("userid", user_id); // Replace with actual user ID
+        formData.append("repoName", repository.name);
+        formData.append("filename", file.name);
+        console.log("File name: ", file.name);
+        console.log("Requesting to upload file on file server");
+        console.log("User ID: ", user_id);
+        console.log("Repository Name: ", repository.name);
+
+        for (let [key, value] of formData.entries()) {
+          console.log(`${key}: ${value}`);
+        }
+
+        const response = await axios.post(
+          "http://localhost:8004/upload_code_to_repo",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        // uploadCodeToRepo(repo)
+
+        console.log("File uploaded successfully", response.data);
+        setUploadComplete(true);
+        setOpenModal(null); // Close the modal on successful upload
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      }
+    }
+  };
+
+  const handleDatasetUpload = async () => {
+    const chunkSize = 1024 * 1024; // 1MB chunk size
+    const totalSize = datasetFile.size;
+    const totalChunks = Math.ceil(totalSize / chunkSize);
+
+    console.log("Uploading file", datasetFile, "with", totalChunks, "chunks");
+
+    let currentChunkIndex = 0;
+
+    const readNextChunk = async () => {
+      console.log("Reading chunk index", currentChunkIndex);
+
+      const fileReader = new FileReader();
+      const offset = currentChunkIndex * chunkSize;
+      const blob = datasetFile.slice(offset, offset + chunkSize);
+
+      fileReader.onload = async () => {
+        const chunk = fileReader.result;
+        const blobChunk = new Blob([chunk]); // Convert ArrayBuffer to Blob
+        const fileChunk = new File([blobChunk], datasetFile.name); // Convert Blob to File
+
+        const formData = new FormData();
+        formData.append("file", fileChunk);
+        formData.append("offset", offset);
+        formData.append("currentChunkIndex", currentChunkIndex);
+        formData.append("totalChunks", totalChunks);
+        formData.append("totalSize", totalSize);
+        formData.append("filename", datasetFile.name);
+        formData.append("filetype", datasetFile.type);
+        formData.append("userid", user_id);
+        formData.append("repoName", repo_id);
+
+        for (let [key, value] of formData.entries()) {
+          console.log(`${key}: ${value}`);
+        }
+
+        try {
+          const response = await axios.post(
+            "http://localhost:8004/upload_dataset_to_repo",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          console.log("Response: ", response.data);
+          currentChunkIndex++;
+
+          if (currentChunkIndex < totalChunks) {
+            readNextChunk();
+          } else {
+            console.log("Dataset uploaded successfully");
+            setUploadComplete(true);
+          }
+        } catch (error) {
+          console.error("Error uploading dataset chunk:", error);
+        }
+      };
+
+      fileReader.readAsArrayBuffer(blob);
+    };
+
+    readNextChunk();
+  };
 
   const [openModal, setOpenModal] = useState<
     "train" | "fineTune" | "infer" | null
@@ -66,18 +205,58 @@ const RepositoryPage = () => {
 
   const fetchRepository = async () => {
     // const response = await axios.get(`/${repo_id}`);
-    const dummyData: Repository = {
-      id: 1,
-      name: "Repository Dummy",
-      description: "This is a dummy repository.",
-      modelAdded: false,
-      dataAdded: false,
-    };
-    setRepository(dummyData);
 
-    // TODO : Fetch repodetails from backend using repo_id
-    //
+    user_id = localStorage.getItem("user_id");
+
+    // get code details
+    const codeDetails = await getCodeFileMetadataFromRepo(user_id, repo_id);
+    console.log("Code Details: ", codeDetails);
+
+    // get data details
+    const dataDetails = await getDataFileMetadataFromRepo(user_id, repo_id);
+    console.log("Data Details: ", dataDetails);
+
+    // get runs
+    const runs = await getRunsFromRepo(user_id, repo_id);
+    console.log("Runs: ", runs);
+
+    const checkModel = (codeDetails) => {
+      if (!codeDetails) return false
+      if (codeDetails.length > 0) {
+        console.log("Model added");
+        return true
+      }
+      return false
+    }
+  
+    const checkData = (dataDetails) => {
+      if (!dataDetails) return false
+      if (dataDetails.length > 0) {
+        return true
+      }
+      return false
+    }
+
+    setRepository({
+      name: repo_id,
+      description: "This is a dummy repository",
+      modelAdded: checkModel(codeDetails),
+      dataAdded: checkData(dataDetails),
+    });
+
+    // setRuns(runs);
   };
+
+  useEffect(() => {
+    fetchRepository();
+  }, [repo_id]);
+
+  useEffect(() => {
+    if (uploadComplete) {
+      fetchRepository();
+      setUploadComplete(false); // Reset the flag
+    }
+  }, [uploadComplete]);
 
   const fetchRuns = async () => {
     // const response = await axios.get(`/${repo_id}/runs`);
@@ -168,12 +347,39 @@ const RepositoryPage = () => {
       {repository && (
         <>
           <Repository repository={repository} />
-          <button onClick={handleUpdateModel} disabled={repository.modelAdded}>
-            Add Model
+          {/* <button onClick={handleUpdateModel} disabled={repository.modelAdded}>
+            Add Code
           </button>
           <button onClick={handleUpdateData} disabled={repository.dataAdded}>
             Add Data
-          </button>
+          </button> */}
+
+          <div>
+            <input
+              type="file"
+              disabled={repository.modelAdded}
+              onChange={(e) =>
+                setFile(e.target.files ? e.target.files[0] : null)
+              }
+            />
+            <button onClick={handleFileUpload} disabled={repository.modelAdded}>
+              Upload Code
+            </button>
+          </div>
+
+          <div>
+            <input
+              type="file"
+              disabled={repository.dataAdded}
+              onChange={handleDatasetFileChange}
+            />
+            <button
+              onClick={handleDatasetUpload}
+              disabled={repository.dataAdded}
+            >
+              Upload Dataset
+            </button>
+          </div>
 
           <button
             onClick={() => toggleModal("train")}
