@@ -264,30 +264,11 @@ const RepositoryPage = () => {
   }, [uploadComplete]);
 
   const fetchRuns = async () => {
-    // const response = await axios.get(`/${repo_id}/runs`);
+    const response = await getRunsFromRepo(user_id, repo_id);
 
-    const dummyData: Run[] = [
-      {
-        id: 1,
-        name: "Dummy Run 1",
-        status: "completed",
-        metrics: {
-          accuracy: 0.9,
-          loss: 0.1,
-        },
-      },
-      {
-        id: 2,
-        name: "Dummy Run 2",
-        status: "completed",
-        metrics: {
-          accuracy: 0.8,
-          loss: 0.2,
-        },
-      },
-    ];
+    console.log("Runs: ", response.data);
 
-    setRuns(dummyData);
+    setRuns(response.data);
 
     // TODO : Fetch runs from backend using repo_id
   };
@@ -575,7 +556,7 @@ const RepositoryPage = () => {
         </div>
       )}
 
-      <h3> Runs </h3>
+      {/* <h3> Runs </h3>
       {runs.map((run) => (
         <li key={run.id} className="mb-2">
           <Link
@@ -585,7 +566,7 @@ const RepositoryPage = () => {
             {run.id}
           </Link>
         </li>
-      ))}
+      ))} */}
     </div>
   );
 };

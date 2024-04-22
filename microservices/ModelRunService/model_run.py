@@ -4,8 +4,12 @@ from load_model import LoadModel
 from process_logs import store_logs
 import uuid
 
-run_id = "run_id"
-global_model_name = "model_name"
+run_id = "temp_run_id"
+global_model_name = "temp_model_name"
+global_run_id = "temp_id"
+global_repo_name = "temp_repo_name"
+global_user_id = "temp_user_id"
+
 
 def train_model(user_id, repo_name, run_id, model_file_id, data_file_id):
     # copy the dataset directory
