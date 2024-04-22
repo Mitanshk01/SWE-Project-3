@@ -1025,7 +1025,7 @@ def train():
     # return jsonify(result)
 
 @app.route('/finetune_model', methods=['POST'])
-def train():
+def finetune():
     request_data = request.json
     print("[In 5000] : ", request_data)
     user_id = request_data['user_id']
@@ -1041,7 +1041,7 @@ def train():
     # return jsonify(result)
 
 @app.route('/infer_model', methods=['POST'])
-def train():
+def infer():
     request_data = request.json
     print("[In 5000] : ", request_data)
     user_id = request_data['user_id']
@@ -1099,6 +1099,12 @@ def get_results():
     if os.path.exists(results_path):
         with open(results_path, "r") as file:
             results["results"] = file.read()
+
+    if os.path.exists(log_path):
+        with open(log_path, "r") as file:
+            results["logs"] = file.read()
+
+    # print("Jo results aaye: ", results)
 
     return jsonify(results)
 
