@@ -4,5 +4,11 @@ microservices/ModelRunService/client_secrets.json
 microservices/ModelRunService/__pycache__
 microservices/ModelRunService/repos
 microservices/ModelRunService/results
+monolithic/ModelRunService/credentials.json
+monolithic/ModelRunService/client_secrets.json
+monolithic/ModelRunService/__pycache__
+monolithic/ModelRunService/repos
+monolithic/ModelRunService/results
+frontend/node_modules/
 /sep3
 /node_modules
