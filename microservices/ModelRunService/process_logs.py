@@ -2,27 +2,65 @@ import pandas as pd
 import json
 import zipfile
 import requests
+import os
+
+def upload_run_to_repo(user_id, repo_name, run_id, results_file, log_file):
+    # API endpoint URL
+    api_url = 'http://localhost:8004/upload_run_to_repo'
+    
+    data = {
+        'userid': user_id,
+        'repo_name': repo_name,
+        'run_id': run_id,
+    }
+
+    # files = {
+    #     'results_file': open(results_file, 'rb'),
+    #     'log_file': open(log_file, 'rb')
+    # }
+
+    results_file_obj = open(results_file, 'rb')
+    log_file_obj = open(log_file, 'rb')
+
+    multipart_form_data = {
+        'userid': (None, data['userid']),
+        'repo_name': (None, data['repo_name']),
+        'run_id': (None, data['run_id']),
+        'results_file': (results_file, results_file_obj, 'application/zip'),
+        'log_file': (log_file, log_file_obj, 'application/zip'),
+    }
+
+    try:
+        response = requests.post(api_url,files = multipart_form_data)
+        if response.status_code == 200:
+            print("Run files uploaded successfully.")
+        else:
+            print(f"An error occurred: {response.text}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        
+    finally:
+        results_file_obj.close()
+        log_file_obj.close()
 
 def store_logs(user_id, repo_name, run_id):
     # Store the file in OneDrive
     logs_path = f"results/{run_id}/logs.csv"
     results_path = f"results/{run_id}/results.txt"
 
-    # Zip the file and upload it to OneDrive
-    with zipfile.ZipFile(f"results/{repo_name}/{run_id}_logs.zip", 'w') as zip_ref:
+    os.makedirs("results/zips", exist_ok=True)
+
+    log_zip = f"results/zips/{run_id}_logs.zip"
+    results_zip = f"results/zips/{run_id}_results.zip"
+
+    with zipfile.ZipFile(log_zip, 'w') as zip_ref:
         zip_ref.write(logs_path)
 
-    with zipfile.ZipFile(f"results/{repo_name}/{run_id}_data.zip", 'w') as zip_ref:
+    with zipfile.ZipFile(results_zip, 'w') as zip_ref:
         zip_ref.write(results_path)
 
-    drive_api_url = 'https://graph.microsoft.com/v1.0/me/drive/root:/FolderName/Filename:/content'
-    drive_api_url += "/users"
-
-    # Upload the zip file to OneDrive
-    upload_one_drive(run_id, logs_path, drive_api_url+"/" + logs_path)
-    upload_one_drive(run_id, results_path, drive_api_url+"/" + results_path)
-
-    update_database(drive_api_url+"/" + logs_path, drive_api_url+"/" + results_path, run_id)
+    upload_run_to_repo(user_id, repo_name, run_id, results_zip, log_zip)
 
     print(f"Logs for run {run_id} stored successfully.")
 

@@ -41,6 +41,10 @@ const RepositoryPage = () => {
   const [codeDetails, setCodeDetails] = useState([]);
   const [dataDetails, setDataDetails] = useState([]);
 
+  const [columnNames, setColumnNames] = useState([]);
+  const [selectedVariable, setSelectedVariable] = useState("");
+
+
   var user_id =
     typeof window !== "undefined" ? localStorage.getItem("user_id") : null;
 
@@ -62,6 +66,24 @@ const RepositoryPage = () => {
     const files = event.target.files;
     if (files) {
       setFileToUpload(files[0]);
+    }
+  };
+
+  const fetchDataHeadings = async () => {
+    if (codeDetails.length > 0) {
+      console.log("Data-viz will start with the following data : ", dataDetails[0].name);
+      //ping the backend to start training
+      const response = await axios.post(`http://localhost:5000/fetch_headings`, {
+        data_file_id: dataDetails[0].id,
+        data_file_name: dataDetails[0].name,
+        user_id: user_id,
+        repo_name: repo_id
+      });
+
+      console.log("Response from backend: ", response.data);
+
+    } else {
+      console.error("No data files available for visualizing.");
     }
   };
 
@@ -174,9 +196,9 @@ const RepositoryPage = () => {
   };
 
   const [openModal, setOpenModal] = useState<
-    "train" | "fineTune" | "infer" | null
+    "train" | "fineTune" | "infer" | "data-viz" | null
   >(null);
-  const toggleModal = (modalName: "train" | "fineTune" | "infer") => {
+  const toggleModal = (modalName: "train" | "fineTune" | "infer" | "data-viz") => {
     if (openModal === modalName) {
       setOpenModal(null); // Close the modal if it's already open
     } else {
@@ -184,7 +206,7 @@ const RepositoryPage = () => {
     }
   };
 
-  const startAction = (actionName: "train" | "fineTune" | "infer") => {
+  const startAction = (actionName: "train" | "fineTune" | "infer" | "data-viz") => {
     console.log(`Start ${actionName} with`, newRunName, newRunDescription);
     setOpenModal(null); // Close the modal after starting the action
     // Add your logic for each action here, possibly sending data to your backend
@@ -430,6 +452,13 @@ const RepositoryPage = () => {
           >
             Infer
           </button>
+
+          <button
+            onClick={() => toggleModal("data-viz")}
+            disabled={!repository?.modelAdded || !repository?.dataAdded}
+          >
+            Visualize Data
+          </button>
         </>
       )}
 
@@ -555,6 +584,27 @@ const RepositoryPage = () => {
           </div>
         </div>
       )}
+
+      {openModal === "data-viz" && (
+        <div>
+          <h2>Select Variable to Visualize</h2>
+          <select
+            value={selectedVariable}
+            onChange={(e) => setSelectedVariable(e.target.value)}
+            onClick={()=>fetchDataHeadings()}
+          >
+            <option value="">Select Variable</option>
+            {columnNames.map((columnName, index) => (
+              <option key={index} value={columnName}>
+                {columnName}
+              </option>
+            ))}
+          </select>
+          {/* Additional visualization components can be added here */}
+        </div>
+      )}
+
+      
 
       {/* <h3> Runs </h3>
       {runs.map((run) => (

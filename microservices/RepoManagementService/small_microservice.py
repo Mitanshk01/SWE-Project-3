@@ -5,6 +5,8 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import os, shutil, io
 import sqlite3
+from werkzeug.utils import secure_filename
+import json
 
 CHUNKS_DIR = "./chunk_files"
 DOWNLOAD_FILE_DIR  = "./download_files"
@@ -452,12 +454,26 @@ def upload_dataset_chunk():
     
 @app.route('/upload_run_to_repo', methods=['POST'])
 def upload_run_to_repo():
+    print("Got a request to upload run files")
     try:
+        print("Request: ", request)
+        # print('\n')
+        # print('\n')
+        # print('\n')
+        # print('\n')
+        # print(request)
+        # print(request.files)
+        # print(request.files['results_file'])
+        # print(request.files['log_file'])
+        # print(request.files['data'])
+        # data = json.loads(request.files['data'].read().decode('utf-8'))   
+        # print(data)  
+        user_id = request.form['userid']
+        repo_name = request.form['repo_name']
+        run_id = request.form['run_id']
+        
         results_file = request.files['results_file']
         log_file = request.files['log_file']
-        user_id = request.form['userid']
-        repo_name = request.form['repoName']
-        run_id = request.form['run_id']
 
         print(f"Received a run upload request from {user_id} for repo {repo_name} with run_id {run_id}")
 
@@ -472,18 +488,25 @@ def upload_run_to_repo():
             return jsonify({'error': 'Repository not found'}), 404
         
         runs_directory_id = result[0]
+
+        print("Run directory id: ", runs_directory_id)
         
         try:
+            temp_dir = '/tmp'
+            results_file_path = os.path.join(temp_dir, secure_filename(results_file.filename))
+            log_file_path = os.path.join(temp_dir, secure_filename(log_file.filename))
+            results_file.save(results_file_path)
+            log_file.save(log_file_path)
             # Create a folder with the same name as run_id in the runs directory
             run_folder_id = google_drive_client.create_folder(folder_name=run_id, parent_id=runs_directory_id)
             print(f"Created folder for run {run_id} in the runs directory")
 
             # Upload results file to the run_id folder
-            results_file_id = google_drive_client.upload_file(file_path=results_file, file_name=results_file.filename, parent_id=run_folder_id)
+            results_file_id = google_drive_client.upload_file(file_path=results_file_path, file_name=results_file.filename, parent_id=run_folder_id)
             print(f"Uploaded results file to run folder: {results_file.filename}")
 
             # Upload log file to the run_id folder
-            log_file_id = google_drive_client.upload_file(file_path=log_file, file_name=log_file.filename, parent_id=run_folder_id)
+            log_file_id = google_drive_client.upload_file(file_path=log_file_path, file_name=log_file.filename, parent_id=run_folder_id)
             print(f"Uploaded log file to run folder: {log_file.filename}")
 
             # Insert the record into the Runs table
@@ -496,6 +519,10 @@ def upload_run_to_repo():
             print("Run files NOT uploaded!\n")
             return jsonify({'error': str(e)}), 500
         finally:
+            if os.path.exists(results_file_path):
+                os.remove(results_file_path)
+            if os.path.exists(log_file_path):
+                os.remove(log_file_path)
             conn.close()
     except Exception as e:
         print("Got error!", e)

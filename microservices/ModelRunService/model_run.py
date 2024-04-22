@@ -2,6 +2,8 @@ import os
 from load_dataset import LoadDataset
 from load_model import LoadModel
 from process_logs import store_logs
+from model_log import ModelLog
+import pandas as pd
 import uuid
 
 run_id = "temp_run_id"
@@ -27,16 +29,22 @@ def train_model(user_id, repo_name, run_id, model_file_id, data_file_id):
 
     os.makedirs(f"results/{run_id}", exist_ok=True)
     results_path = f'results/{run_id}/results.txt'
+    log_path = f'results/{run_id}/logs.csv'
     
     print("Running model")
 
-    os.system(f"python repos/{repo_name}/model/train.py > {results_path}")
+    os.system(f"PYTHONPATH=$PYTHONPATH:/path/to/model_log.py python repos/{repo_name}/model/train.py > {results_path}")
+    # os.system(f"python repos/{repo_name}/model/train.py > {results_path}")
     print("Model run complete")
 
     results = ""
     # return the results as a string
     with open(results_path, "r") as file:
         results = file.read()
+
+    # write empty DataFrame to log file
+    if not os.path.exists(log_path):
+        pd.DataFrame().to_csv(log_path, index=False)
 
     print("Results: ", results)
 

@@ -1,42 +1,27 @@
-from flask import Flask, request, jsonify
-from load_dataset import LoadDataset
+from flask import request, jsonify
+from load_dataset_viz import LoadDatasetViz
 import pandas as pd
 
-app = Flask(__name__)
-
-@app.route('/fetch-table-headings', methods=['GET'])
-def fetch_table_headings():
-    repo_name = request.args.get('repo_name')
-    file_id = request.args.get('file_id')
+def fetch_table_headings(user_id, repo_name, data_file_id):
+    LoadDatasetViz(repo_name, data_file_id)
     
-    file_path = load_dataset_viz(repo_name, file_id)
+    dataset_path = f"repos/{repo_name}/data/{data_file_id}.csv"
+    df = pd.read_csv(dataset_path)
     
-    # Load the dataset using Pandas
-    df = pd.read_csv(file_path)
-    
-    # Extract column names
     column_names = df.columns.tolist()
     
-    return jsonify(column_names)
+    return column_names
 
-@app.route('/fetch-column-details', methods=['GET'])
-def fetch_column_details():
-    repo_name = request.args.get('repo_name')
-    file_id = request.args.get('file_id')
-    column_name = request.args.get('column_name')
-    
-    file_path = load_dataset_viz(repo_name, file_id)
-    
-    # Load the dataset using Pandas
-    df = pd.read_csv(file_path)
+def fetch_column_details(user_id, repo_name, data_file_id, col_name):
+    LoadDatasetViz(repo_name, data_file_id)
+
+    dataset_path = f"repos/{repo_name}/data/{data_file_id}.csv"
+    df = pd.read_csv(dataset_path)
     
     # Check if the column exists
-    if column_name in df.columns:
+    if col_name in df.columns:
         # Extract data for the specified column
-        column_data = df[column_name].tolist()
-        return jsonify(column_data)
+        column_data = df[col_name].tolist()
+        return column_data
     else:
-        return jsonify({"error": "Column not found"}), 404
-
-if __name__ == '__main__':
-    app.run(debug=True)
+        return None
