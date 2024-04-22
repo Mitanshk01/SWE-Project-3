@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-from model_run import train_model
+from model_run import train_model, finetune_model, infer_model
 from visualize_data import fetch_table_headings, fetch_column_details
 from model_run import global_model_name, global_repo_name, global_run_id, global_user_id
 
@@ -1018,6 +1018,38 @@ def train():
     model_file_id = request_data['model_file_id']
     data_file_id = request_data['data_file_id']
     model_run = train_model(user_id, repo_name, run_id, model_file_id, data_file_id)
+
+    print(f"Trained model for user {user_id}, repo {repo_name}, run {run_id}")
+
+    return jsonify({'status': 'success'})
+    # return jsonify(result)
+
+@app.route('/finetune_model', methods=['POST'])
+def train():
+    request_data = request.json
+    print("[In 5000] : ", request_data)
+    user_id = request_data['user_id']
+    repo_name = request_data['repo_name']  # format repo/model
+    run_id = request_data['run_name']
+    model_file_id = request_data['model_file_id']
+    data_file_id = request_data['data_file_id']
+    model_run = finetune_model(user_id, repo_name, run_id, model_file_id, data_file_id)
+
+    print(f"Trained model for user {user_id}, repo {repo_name}, run {run_id}")
+
+    return jsonify({'status': 'success'})
+    # return jsonify(result)
+
+@app.route('/infer_model', methods=['POST'])
+def train():
+    request_data = request.json
+    print("[In 5000] : ", request_data)
+    user_id = request_data['user_id']
+    repo_name = request_data['repo_name']  # format repo/model
+    run_id = request_data['run_name']
+    model_file_id = request_data['model_file_id']
+    data_file_id = request_data['data_file_id']
+    model_run = infer_model(user_id, repo_name, run_id, model_file_id, data_file_id)
 
     print(f"Trained model for user {user_id}, repo {repo_name}, run {run_id}")
 
