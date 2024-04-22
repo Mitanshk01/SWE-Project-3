@@ -9,7 +9,7 @@ CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 @app.route('/train_model', methods=['POST'])
 def train():
     request_data = request.json
-    print(request_data)
+    print("[In 5000] : ", request_data)
     user_id = request_data['user_id']
     repo_name = request_data['repo_name']  # format repo/model
     run_id = request_data['run_name']
@@ -17,14 +17,12 @@ def train():
     data_file_id = request_data['data_file_id']
     model_run = train_model(user_id, repo_name, run_id, model_file_id, data_file_id)
 
-    print(f"Training model for user {user_id}, repo {repo_name}, run {run_id}, file {file_id}")
+    print(f"Trained model for user {user_id}, repo {repo_name}, run {run_id}")
 
     return jsonify({'status': 'success'})
     # return jsonify(result)
 
 if __name__ == '__main__':
-    os.makedirs('model', exist_ok=True)
-    os.makedirs('data', exist_ok=True)
-    app.run(host='localhost', port=5000, debug=True)
+    app.run(host='localhost', port=5000)
 
 

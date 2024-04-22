@@ -18,7 +18,10 @@ def LoadModel(user_id, repo_name, run_id, file_id):
     for file in glob.glob(f"download_files/{file_id}/*.zip"):
         print(file)
         with zipfile.ZipFile(file, 'r') as zip_ref:
-            zip_ref.extractall(f"model/{file_id}")
+            os.makedirs(f"repos/{repo_name}/model", exist_ok=True)
+            zip_ref.extractall(f"repos/{repo_name}/model")
+            print(f"Unzipped {file} to repos/{repo_name}/model")
+
 
     # Remove the .zip files
     for file in glob.glob(f"download_files/{file_id}/*.zip"):

@@ -4,5 +4,5 @@
 /chunk_files
 /download_files
 /biggerenvname
-/microservices/__pyache__
+/microservices/ModelRunService/__pycache__
 *.db
