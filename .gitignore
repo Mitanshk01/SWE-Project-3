@@ -1,0 +1,8 @@
+backend/node_modules/
+microservices/ModelRunService/credentials.json
+microservices/ModelRunService/client_secrets.json
+microservices/ModelRunService/__pycache__
+microservices/ModelRunService/repos
+microservices/ModelRunService/results
+/sep3
+/node_modules

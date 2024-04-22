@@ -1,0 +1,9 @@
+*.json
+*/*.json
+*/*/*.json
+/chunk_files
+/download_files
+/biggerenvname
+/microservices/ModelRunService/__pycache__
+*.db
+/sep3
