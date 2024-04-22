@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { RunLogs } from '@/components/Run';
 import { RunResults } from '@/components/Run';
+import { getFileMetadataFromRun } from '@/components/Requests';
 
 const RunPage = () => {
   const router = useRouter();
@@ -18,7 +19,9 @@ const RunPage = () => {
   }, [run_id]);
 
   const fetchRun = () => {
-    //TODO : get run details using run_id from backend
+    
+
+    console.log(data);
 
     const dummy_data = {
       run_id : run_id,

@@ -52,6 +52,24 @@ def fetch_col_details():
         return jsonify(column)
     else:
         return jsonify({"error": "Column not found"}), 404
+    
+
+@app.route('/get_results', methods=['POST'])
+def get_results():
+    print("Inside get_results")
+    request_data = request.json
+    run_id = request_data['run_id']
+
+    results_path = f'results/{run_id}/results.txt'
+    log_path = f'results/{run_id}/logs.csv'
+
+    results = { "results": "", "logs": "" }
+
+    if os.path.exists(results_path):
+        with open(results_path, "r") as file:
+            results["results"] = file.read()
+
+    return jsonify(results)
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5000)

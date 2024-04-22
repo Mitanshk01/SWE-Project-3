@@ -168,9 +168,9 @@ export const getRunsFromRepo = async (userId, repoName) => {
 }
 
 // Function to retrieve metadata of all files in a specific run directory of a repository
-export const getFileMetadataFromRun = async (userId, repoName, runId) => {
+export const getFileMetadataFromRun = async (runId) => {
   try {
-    const response = await axios.get(`http://localhost:8004/get_file_metadata_from_run?user_id=${userId}&repo_name=${repoName}&run_id=${runId}`);
+    const response = await axios.get(`http://localhost:8004/get_file_metadata_from_run?run_id=${runId}`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -212,6 +212,15 @@ export const deleteDataFromRepo = async (userId, repoName, fileName) => {
 export const deleteRunFromRepo = async (userId, repoName, runId) => {
   try {
     const response = await axios.delete(`http://localhost:8004/delete_run_from_repo?user_id=${userId}&repo_name=${repoName}&run_id=${runId}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export const getResultsandLogsfromRun = async (run_id) => {
+  try {
+    const response = await axios.post(`http://localhost:5000/delete_run_from_repo?run_id=${runId}`);
     return response.data;
   } catch (error) {
     console.error(error);

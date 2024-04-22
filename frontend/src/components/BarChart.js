@@ -25,7 +25,6 @@ const BarChart = ({ data }) => {
   return (
     <Plot
       data={chartData}
-      layout={layout}
     />
   );
 };

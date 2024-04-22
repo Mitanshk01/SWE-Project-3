@@ -238,37 +238,6 @@ class GoogleDriveClient:
             return False
 
 google_drive_client = GoogleDriveClient()
-
-# deprecated - use upload_code_to_repo
-# @app.route('/upload_file_to_drive', methods=['POST'])
-# def handle_upload():
-#     file = request.files['file']
-#     print("\n\tReceived a file upload request")
-
-#     # seeing name
-#     filename = request.form.get('filename')
-#     print("File name", filename)
-
-#     # Accessing size
-#     file.seek(0, 2) 
-#     file_size = file.tell() 
-#     print("File size:", file_size, "bytes")
-
-#     file.seek(0)
-
-#     try:
-#         # Save the file temporarily
-#         with NamedTemporaryFile(delete=False) as temp_file:
-#             file.save(temp_file.name)
-#             temp_file_path = temp_file.name
-            
-#             # Upload the file to Google Drive
-#             google_drive_client.upload_file(file_path=temp_file_path, file_name=filename)
-#             print("File uploaded!\n")
-#             return jsonify({'message': 'File uploaded successfully to Google Drive'}), 200
-#     except Exception as e:
-#         print("File NOT uploaded!\n")
-#         return jsonify({'error': str(e)}), 500
     
 @app.route('/create_repository', methods=['PUT'])
 def create_repository():
@@ -457,17 +426,6 @@ def upload_run_to_repo():
     print("Got a request to upload run files")
     try:
         print("Request: ", request)
-        # print('\n')
-        # print('\n')
-        # print('\n')
-        # print('\n')
-        # print(request)
-        # print(request.files)
-        # print(request.files['results_file'])
-        # print(request.files['log_file'])
-        # print(request.files['data'])
-        # data = json.loads(request.files['data'].read().decode('utf-8'))   
-        # print(data)  
         user_id = request.form['userid']
         repo_name = request.form['repo_name']
         run_id = request.form['run_id']

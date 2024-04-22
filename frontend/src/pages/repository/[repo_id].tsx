@@ -317,6 +317,7 @@ const RepositoryPage = () => {
     // get runs
     const runs = await getRunsFromRepo(user_id, repo_id);
     console.log("Runs: ", runs);
+    setRuns(runs);
 
     const checkModel = (codeDetails) => {
       if (!codeDetails) return false
@@ -676,7 +677,7 @@ const RepositoryPage = () => {
       >
         Visualize
     </button>
-    <div>
+    {/* <div>
       {selectedVariable && (
         <>
           <h3>Bar Chart for {selectedVariable}</h3>
@@ -685,24 +686,26 @@ const RepositoryPage = () => {
           {columnData.length > 0 && <LineChart data={columnData} />}
         </>
       )}
-    </div>
+    </div> */}
   </div>
 )}
 
       
 
-      {/* <h3> Runs </h3>
-      {runs.map((run) => (
-        <li key={run.id} className="mb-2">
+      <h3> Runs </h3>
+      {runs && runs.length > 0 ? runs.map((run) => (
+        <li key={run} className="mb-2">
           <Link
-            href={`/run/${run.id}`}
+            href={`/run/${run}`}
             className="text-blue-600 hover:text-blue-800"
           >
-            {run.id}
+            {run}
           </Link>
         </li>
-      ))} */}
+      )) : <h5>No Run</h5>}
     </div>
+
+    
   );
 };
 
