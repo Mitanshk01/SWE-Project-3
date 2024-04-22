@@ -3,13 +3,15 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { RunLogs } from '@/components/Run';
 import { RunResults } from '@/components/Run';
-import { getFileMetadataFromRun } from '@/components/Requests';
+import { getFileMetadataFromRun, getResultsandLogsfromRun } from '@/components/Requests';
 
 const RunPage = () => {
   const router = useRouter();
   const { run_id } = router.query;
 
   const [run, setRun] = useState(null);
+  const [logs, setLogs] = useState('');
+  const [results, setResults] = useState('');
 
   useEffect(() => {
     if (run_id) {
@@ -18,18 +20,15 @@ const RunPage = () => {
     }
   }, [run_id]);
 
-  const fetchRun = () => {
+  const fetchRun = async () => {
     
+    const data = await getResultsandLogsfromRun(run_id);
 
-    console.log(data);
+    console.log(data.logs);
 
-    const dummy_data = {
-      run_id : run_id,
-      description : "dummy run", 
-      status : "in progress"
-    }
-
-    setRun(dummy_data);
+    setLogs(data.logs);
+    setResults(data.results);
+    setRun(data);
   };
 
   const handleVisualize = () => {
@@ -40,15 +39,19 @@ const RunPage = () => {
     <div>
       {run && (
         <>
-          <h4> Status : {run.status} </h4>
+          <h4> Status : Completed  </h4>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div >
                 <h4>Logs</h4>
-                <RunLogs runId={run_id} />
+                <div style={{ width: '300px', height: '300px', overflow: 'auto' }}>
+                  <pre>{logs}</pre>
+                </div>
             </div>
             <div>
                 <h4>Results</h4>
-                <RunResults runId={run_id} />
+                <div style={{ width: '300px', height: '300px', overflow: 'auto' }}>
+                  <pre>{results}</pre>
+                </div>
             </div>
           </div>
           <button onClick={handleVisualize}>Visualize</button>
