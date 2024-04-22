@@ -454,7 +454,7 @@ const RepositoryPage = () => {
           </button>
 
           <button
-            onClick={() => toggleModal("data-viz")}
+            onClick={() => {toggleModal("data-viz");fetchDataHeadings();}}
             disabled={!repository?.modelAdded || !repository?.dataAdded}
           >
             Visualize Data
@@ -471,7 +471,7 @@ const RepositoryPage = () => {
             <input
               type="text"
               value={newRunName}
-              onChange={(e) => {console.log("Changing run name: ", newRunName);setNewRunName(e.target.value)}}
+              onChange={async(e) => {console.log("Changing run name: ", newRunName);setNewRunName(e.target.value)}}
               placeholder="Run Name"
               className="border p-2 w-full"
               required
@@ -591,7 +591,6 @@ const RepositoryPage = () => {
           <select
             value={selectedVariable}
             onChange={(e) => setSelectedVariable(e.target.value)}
-            onClick={()=>fetchDataHeadings()}
           >
             <option value="">Select Variable</option>
             {columnNames.map((columnName, index) => (

@@ -6,3 +6,4 @@
 /biggerenvname
 /microservices/ModelRunService/__pycache__
 *.db
+/sep3

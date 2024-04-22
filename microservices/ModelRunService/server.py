@@ -7,6 +7,7 @@ from model_run import global_model_name, global_repo_name, global_run_id, global
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
+# CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]}})
 
 @app.route('/train_model', methods=['POST'])
 def train():
