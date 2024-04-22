@@ -1,37 +1,9 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-//TODO :remove this
-var dummy_data = `
-Accuracy : 88,
-Accuracy : 92,
-Accuracy : 96,
-Accuracy : 98,
-Accuracy : 99,
-Accuracy : 88,
-Accuracy : 92,
-Accuracy : 96,
-Accuracy : 98,
-Accuracy : 99,
-Accuracy : 88,
-Accuracy : 92,
-Accuracy : 96,
-Accuracy : 98,
-Accuracy : 99,
-Accuracy : 88,
-Accuracy : 92,
-Accuracy : 96,
-Accuracy : 98,
-Accuracy : 99,
-Accuracy : 88,
-Accuracy : 92,
-Accuracy : 96,
-Accuracy : 98,
-Accuracy : 99,
-`;
 
 const RunLogs = ({ runId }) => {
-  const [logs, setLogs] = useState('');
+  
 
   useEffect(() => {
     fetchLogs();
@@ -44,12 +16,6 @@ const RunLogs = ({ runId }) => {
     // const response = await axios.get(`/run/${runId}/logs`);
     
     // TODO : Fetch logs from backend
-
-    const dummy_data = `
-        loss : 1.1,
-        loss : 1.2
-        `;
-    setLogs(dummy_data);
   };
 
   return (
@@ -72,10 +38,6 @@ const RunResults = ({ runId }) => {
   const fetchResults = async () => {
     // const response = await axios.get(`/run/${runId}/results`);
 
-    // TODO : Fetch logs from backend
-    dummy_data = dummy_data + `Accuracy : 99,\n`;
-
-    setResults(dummy_data);
   };
 
   return (
