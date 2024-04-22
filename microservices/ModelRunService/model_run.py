@@ -30,11 +30,19 @@ def train_model(user_id, repo_name, run_id, model_file_id, data_file_id):
     os.makedirs(f"results/{run_id}", exist_ok=True)
     results_path = f'results/{run_id}/results.txt'
     log_path = f'results/{run_id}/logs.csv'
+
+    # save the run_id to a run_id.txt file in repos/{repo_name}/model folder
+    with open(f"repos/run_id.txt", "w") as file:
+        print("Writing run_id to file")
+        file.write(run_id)
+        print("Write successful.")
     
     print("Running model")
 
-    os.system(f"PYTHONPATH=$PYTHONPATH:/path/to/model_log.py python repos/{repo_name}/model/train.py > {results_path}")
+    os.system(f"PYTHONPATH=$PYTHONPATH:. RUN_ID={run_id} python repos/{repo_name}/model/train.py > {results_path}")
+    
     # os.system(f"python repos/{repo_name}/model/train.py > {results_path}")
+
     print("Model run complete")
 
     results = ""

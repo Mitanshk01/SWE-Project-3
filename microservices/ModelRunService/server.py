@@ -28,31 +28,25 @@ def train():
 
 @app.route('/fetch_headings', methods=['GET'])
 def fetch_headings():
-    request_data = request.json
-    user_id = request_data['user_id']
-    repo_name = request_data['repo_name']
-    data_file_id = request_data['data_file_id']
+    print("Inside Fetch")
+    user_id = request.args.get('user_id')
+    repo_name = request.args.get('repo_name')
+    data_file_id = request.args.get('data_file_id')
 
     column_names = fetch_table_headings(user_id, repo_name, data_file_id)
-    
-    # # Load the dataset using Pandas
-    # df = pd.read_csv(file_path)
-    
-    # # Extract column names
-    # column_names = df.columns.tolist()
     
     return jsonify(column_names)
 
 @app.route('/fetch_column', methods=['GET'])
-def fetch_column_details(user_id, repo_name, data_file_id):
-    request_data = request.json
-    user_id = request_data['user_id']
-    repo_name = request_data['repo_name']
-    col_name = request_data['col']
+def fetch_col_details():
+    print("Fetching Columns!!!")
+    user_id = request.args.get('user_id')
+    repo_name = request.args.get('repo_name')
+    data_file_id = request.args.get('data_file_id')
+    col_name = request.args.get('col')
 
     column = fetch_column_details(user_id, repo_name, data_file_id, col_name)
     
-    # Check if the column exists
     if column:
         # Extract data for the specified column
         return jsonify(column)

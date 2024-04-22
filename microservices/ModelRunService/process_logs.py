@@ -65,44 +65,42 @@ def store_logs(user_id, repo_name, run_id):
     print(f"Logs for run {run_id} stored successfully.")
 
 
-def upload_one_drive(run_id, path, api_url):
-    # Upload the zip file to OneDrive
+# def upload_one_drive(run_id, path, api_url):
+#     # Upload the zip file to OneDrive
 
-    access_token = 'your_access_token'  # replace with your actual access token
-    headers = {'Authorization': 'Bearer ' + access_token}
-    params = {'@name.conflictBehavior': 'rename'}
-    data = open(path, 'rb').read()
+#     access_token = 'your_access_token'  # replace with your actual access token
+#     headers = {'Authorization': 'Bearer ' + access_token}
+#     params = {'@name.conflictBehavior': 'rename'}
+#     data = open(path, 'rb').read()
 
-    response = requests.put(
-        api_url,
-        headers=headers,
-        params=params,
-        data=data
-    )
+#     response = requests.put(
+#         api_url,
+#         headers=headers,
+#         params=params,
+#         data=data
+#     )
 
-    if response.status_code == 201:
-        print(f"Logs for run {run_id} stored successfully.")
-    else:
-        print(f"Failed to store logs for run {run_id}. Error: {response.text}")
+#     if response.status_code == 201:
+#         print(f"Logs for run {run_id} stored successfully.")
+#     else:
+#         print(f"Failed to store logs for run {run_id}. Error: {response.text}")
 
+# def update_database(onedrive_link_logs, onedrive_link_results, run_id):
+#     # Update the database with the link to the logs
 
-def update_database(onedrive_link_logs, onedrive_link_results, run_id):
-    # Update the database with the link to the logs
+#     api_url = 'http://127.0.0.1:8000/logs'
 
-    api_url = 'http://127.0.0.1:8000/logs'
+#     params = {
+#         'onedrive_link_logs': onedrive_link_logs,
+#         'onedrive_link_results': onedrive_link_results,
+#         'run_id': run_id
+#     }
 
-    params = {
-        'onedrive_link_logs': onedrive_link_logs,
-        'onedrive_link_results': onedrive_link_results,
-        'run_id': run_id
-    }
+#     response = requests.post(api_url, json=params)
 
-    response = requests.post(api_url, json=params)
-
-    if response.status_code == 201:
-        print("Database updated successfully.")
-        return True
-    else:
-        print(f"Failed to update database. Error: {response.text}")
-        return False
-    
+#     if response.status_code == 201:
+#         print("Database updated successfully.")
+#         return True
+#     else:
+#         print(f"Failed to update database. Error: {response.text}")
+#         return False

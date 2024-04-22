@@ -9,14 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@nivo/bar": "^0.85.1",
     "axios": "^1.6.8",
     "formidable": "^3.5.1",
     "next": "14.2.1",
     "papaparse": "^5.4.1",
+    "plotly.js": "^2.31.1",
     "react": "^18",
     "react-dom": "^18",
     "react-plotly.js": "^2.6.0",
-    "styled-components": "^6.1.8"
+    "styled-components": "^6.1.8",
+    "victory": "^37.0.2"
   },
   "devDependencies": {
     "@types/node": "^20",

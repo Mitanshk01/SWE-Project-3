@@ -5,7 +5,7 @@ import pandas as pd
 def fetch_table_headings(user_id, repo_name, data_file_id):
     LoadDatasetViz(repo_name, data_file_id)
     
-    dataset_path = f"repos/{repo_name}/data/{data_file_id}.csv"
+    dataset_path = f"repos/{repo_name}/data/train.csv"
     df = pd.read_csv(dataset_path)
     
     column_names = df.columns.tolist()
@@ -15,7 +15,7 @@ def fetch_table_headings(user_id, repo_name, data_file_id):
 def fetch_column_details(user_id, repo_name, data_file_id, col_name):
     LoadDatasetViz(repo_name, data_file_id)
 
-    dataset_path = f"repos/{repo_name}/data/{data_file_id}.csv"
+    dataset_path = f"repos/{repo_name}/data/train.csv"
     df = pd.read_csv(dataset_path)
     
     # Check if the column exists

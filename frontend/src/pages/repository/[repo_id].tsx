@@ -7,6 +7,8 @@ import { uploadCodeToRepo } from "@/components/Requests";
 import { getCodeFileMetadataFromRepo } from "../../components/Requests.js";
 import { getDataFileMetadataFromRepo } from "../../components/Requests.js";
 import { getRunsFromRepo } from "../../components/Requests.js";
+import BarChart from "../../components/BarChart.js";
+import LineChart from "../../components/LineChart.js";
 
 interface Run {
   id: number;
@@ -24,6 +26,48 @@ interface Repository {
   modelAdded: boolean;
   dataAdded: boolean;
 }
+
+// const renderBarChart = (occurrences) => {
+//   const labelCounts = {};
+//   occurrences.forEach(label => {
+//     labelCounts[label] = (labelCounts[label] || 0) + 1;
+//   });
+
+//   // Extract unique labels and their frequencies
+//   const labels = Object.keys(labelCounts);
+//   const frequencies = Object.values(labelCounts);
+
+//   console.log(labels, frequencies);
+
+//   // Define data for the Bar Chart
+//   const chartData = {
+//     labels: labels,
+//     datasets: [
+//       {
+//         label: "Frequency",
+//         backgroundColor: "rgba(75,192,192,1)",
+//         borderColor: "rgba(0,0,0,1)",
+//         borderWidth: 2,
+//         data: frequencies,
+//       },
+//     ],
+//   };
+
+//   // Define options for the Bar Chart
+//   const chartOptions = {
+//     scales: {
+//       yAxes: [
+//         {
+//           ticks: {
+//             beginAtZero: true,
+//           },
+//         },
+//       ],
+//     },
+//   };
+
+//   return <Bar data={ chartData} options={chartOptions} />;
+// };
 
 const RepositoryPage = () => {
   const router = useRouter();
@@ -43,7 +87,7 @@ const RepositoryPage = () => {
 
   const [columnNames, setColumnNames] = useState([]);
   const [selectedVariable, setSelectedVariable] = useState("");
-
+  const [columnData, setColumnData] = useState([]);
 
   var user_id =
     typeof window !== "undefined" ? localStorage.getItem("user_id") : null;
@@ -73,12 +117,16 @@ const RepositoryPage = () => {
     if (codeDetails.length > 0) {
       console.log("Data-viz will start with the following data : ", dataDetails[0].name);
       //ping the backend to start training
-      const response = await axios.post(`http://localhost:5000/fetch_headings`, {
-        data_file_id: dataDetails[0].id,
-        data_file_name: dataDetails[0].name,
-        user_id: user_id,
-        repo_name: repo_id
+      const response = await axios.get(`http://localhost:5000/fetch_headings`, {
+        params: {  
+          data_file_id: dataDetails[0].id,
+          data_file_name: dataDetails[0].name,
+          user_id: user_id,
+          repo_name: repo_id
+        }
       });
+
+      setColumnNames(response.data);
 
       console.log("Response from backend: ", response.data);
 
@@ -86,6 +134,29 @@ const RepositoryPage = () => {
       console.error("No data files available for visualizing.");
     }
   };
+
+  const fetchColumnData = async() => {
+    if (codeDetails.length > 0 && selectedVariable !== "") {
+      console.log("Data-viz will start with the following data : ", dataDetails[0].name);
+      //ping the backend to start training
+      const response = await axios.get(`http://localhost:5000/fetch_column`, {
+        params: {  
+          data_file_id: dataDetails[0].id,
+          data_file_name: dataDetails[0].name,
+          user_id: user_id,
+          repo_name: repo_id,
+          col: selectedVariable
+        }
+      });
+
+      setColumnData(response.data);
+
+      console.log("Response from backend: ", response.data);
+
+    } else {
+      console.error("No data files available for visualizing.");
+    }
+  }
 
   // Handler for file upload
   const handleFileUpload = async () => {
@@ -585,23 +656,38 @@ const RepositoryPage = () => {
         </div>
       )}
 
-      {openModal === "data-viz" && (
-        <div>
-          <h2>Select Variable to Visualize</h2>
-          <select
-            value={selectedVariable}
-            onChange={(e) => setSelectedVariable(e.target.value)}
-          >
-            <option value="">Select Variable</option>
-            {columnNames.map((columnName, index) => (
-              <option key={index} value={columnName}>
-                {columnName}
-              </option>
-            ))}
-          </select>
-          {/* Additional visualization components can be added here */}
-        </div>
+{openModal === "data-viz" && (
+  <div>
+    <h2>Select Variable to Visualize</h2>
+    <select
+      value={selectedVariable}
+      onChange={(e) => setSelectedVariable(e.target.value)}
+    >
+      <option value="">Select Variable</option>
+      {columnNames.map((columnName, index) => (
+        <option key={index} value={columnName}>
+          {columnName}
+        </option>
+      ))}
+    </select>
+    <button
+        onClick={() => fetchColumnData()}
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Visualize
+    </button>
+    <div>
+      {selectedVariable && (
+        <>
+          <h3>Bar Chart for {selectedVariable}</h3>
+          {columnData.length > 0 && <BarChart data={columnData} />}
+          <h3>Line Chart for {selectedVariable}</h3>
+          {columnData.length > 0 && <LineChart data={columnData} />}
+        </>
       )}
+    </div>
+  </div>
+)}
 
       
 
