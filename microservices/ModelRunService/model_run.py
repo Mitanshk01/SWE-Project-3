@@ -25,7 +25,7 @@ def train_model(user_id, repo_name, run_id, model_file_id, data_file_id):
     results_path = f'results/{run_id}/results.txt'
     
     print("Running model")
-    # # run the model and store the results in a file
+
     os.system(f"python repos/{repo_name}/model/train.py > {results_path}")
     print("Model run complete")
 
@@ -37,6 +37,6 @@ def train_model(user_id, repo_name, run_id, model_file_id, data_file_id):
     print("Results: ", results)
 
     # TODO 
-    # store_logs(user_id, repo_name, run_id, results_path)
+    store_logs(user_id, repo_name, run_id)
 
     return results

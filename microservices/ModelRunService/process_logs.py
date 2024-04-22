@@ -3,16 +3,16 @@ import json
 import zipfile
 import requests
 
-def store_logs(model_name, run_id):
+def store_logs(user_id, repo_name, run_id):
     # Store the file in OneDrive
-    logs_path = "results/{model_name}/{run_id}_logs.csv"
-    results_path = f"results/{model_name}/{run_id}.txt"
+    logs_path = f"results/{run_id}/logs.csv"
+    results_path = f"results/{run_id}/results.txt"
 
     # Zip the file and upload it to OneDrive
-    with zipfile.ZipFile(f"results/{model_name}/{run_id}_logs.zip", 'w') as zip_ref:
+    with zipfile.ZipFile(f"results/{repo_name}/{run_id}_logs.zip", 'w') as zip_ref:
         zip_ref.write(logs_path)
 
-    with zipfile.ZipFile(f"results/{model_name}/{run_id}_data.zip", 'w') as zip_ref:
+    with zipfile.ZipFile(f"results/{repo_name}/{run_id}_data.zip", 'w') as zip_ref:
         zip_ref.write(results_path)
 
     drive_api_url = 'https://graph.microsoft.com/v1.0/me/drive/root:/FolderName/Filename:/content'

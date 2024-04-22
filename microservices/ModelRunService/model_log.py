@@ -5,7 +5,6 @@ import pandas as pd
 import os
 
 def ModelLog():
-
     # combime two dictionaries globals() and locals()
     variables = {**locals(), **globals()}
     print(variables)
