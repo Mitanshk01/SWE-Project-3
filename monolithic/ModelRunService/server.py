@@ -1104,8 +1104,6 @@ def get_results():
         with open(log_path, "r") as file:
             results["logs"] = file.read()
 
-    # print("Jo results aaye: ", results)
-
     return jsonify(results)
 
 if __name__ == '__main__':
