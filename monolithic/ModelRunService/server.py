@@ -1068,6 +1068,10 @@ def get_results():
         with open(results_path, "r") as file:
             results["results"] = file.read()
 
+    if os.path.exists(log_path):
+        with open(log_path, "r") as file:
+            results["logs"] = file.read()
+            
     return jsonify(results)
 
 if __name__ == '__main__':
