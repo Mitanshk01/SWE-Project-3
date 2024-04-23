@@ -679,7 +679,7 @@ const RepositoryPage = () => {
       >
         Visualize
     </button>
-    {/* <div>
+    <div>
       {selectedVariable && (
         <>
           <h3>Bar Chart for {selectedVariable}</h3>
@@ -688,7 +688,7 @@ const RepositoryPage = () => {
           {columnData.length > 0 && <LineChart data={columnData} />}
         </>
       )}
-    </div> */}
+    </div>
   </div>
 )}
 
