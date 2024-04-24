@@ -220,7 +220,7 @@ export const deleteRunFromRepo = async (userId, repoName, runId) => {
 
 export const getResultsandLogsfromRun = async (run_id) => {
   try {
-    const response = await axios.post('http://localhost:8004/get_results', { run_id: run_id });
+    const response = await axios.post('http://localhost:5000/get_results', { run_id: run_id });
     return response.data;
   } catch (error) {
     console.error(error);

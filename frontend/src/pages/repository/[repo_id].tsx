@@ -117,7 +117,7 @@ const RepositoryPage = () => {
     if (codeDetails.length > 0) {
       console.log("Data-viz will start with the following data : ", dataDetails[0].name);
       //ping the backend to start training
-      const response = await axios.get(`http://localhost:8004/fetch_headings`, {
+      const response = await axios.get(`http://localhost:5000/fetch_headings`, {
         params: {  
           data_file_id: dataDetails[0].id,
           data_file_name: dataDetails[0].name,
@@ -139,7 +139,7 @@ const RepositoryPage = () => {
     if (codeDetails.length > 0 && selectedVariable !== "") {
       console.log("Data-viz will start with the following data : ", dataDetails[0].name);
       //ping the backend to start training
-      const response = await axios.get(`http://localhost:8004/fetch_column`, {
+      const response = await axios.get(`http://localhost:5000/fetch_column`, {
         params: {  
           data_file_id: dataDetails[0].id,
           data_file_name: dataDetails[0].name,
@@ -412,7 +412,7 @@ const RepositoryPage = () => {
       console.log("And with the following : ", codeDetails[0].id);
 
       //ping the backend to start training
-      const response = await axios.post('http://localhost:8004/train_model', {
+      const response = await axios.post('http://localhost:5000/train_model', {
         model_file_id: codeDetails[0].id,
         model_file_name: codeDetails[0].name,
         data_file_id: dataDetails[0].id,
@@ -679,7 +679,7 @@ const RepositoryPage = () => {
       >
         Visualize
     </button>
-    {/* <div>
+    <div>
       {selectedVariable && (
         <>
           <h3>Bar Chart for {selectedVariable}</h3>
@@ -688,7 +688,7 @@ const RepositoryPage = () => {
           {columnData.length > 0 && <LineChart data={columnData} />}
         </>
       )}
-    </div> */}
+    </div>
   </div>
 )}
 

@@ -27,7 +27,7 @@ def train():
 
 
 @app.route('/finetune_model', methods=['POST'])
-def train():
+def finetune():
     request_data = request.json
     print("[In 5000] : ", request_data)
     user_id = request_data['user_id']
@@ -43,7 +43,7 @@ def train():
     # return jsonify(result)
 
 @app.route('/infer_model', methods=['POST'])
-def train():
+def infer():
     request_data = request.json
     print("[In 5000] : ", request_data)
     user_id = request_data['user_id']
