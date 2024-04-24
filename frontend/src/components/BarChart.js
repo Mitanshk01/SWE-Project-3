@@ -1,6 +1,7 @@
 // BarChart.js
 import React from 'react';
-import Plot from 'react-plotly.js';
+import dynamic from "next/dynamic";
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false, })
 
 const BarChart = ({ data }) => {
   // Create labels for each value (1, 2, 3, ...)
